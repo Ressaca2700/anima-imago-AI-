@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery — Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" class="active" data-i18n="nav.gallery">Gallery</a>
+      <a href="index.html#about" data-i18n="nav.about">About</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="commission.html" data-i18n="nav.commission">Commission a Piece</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <a class="cart-link" href="cart.html">
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1 data-i18n="gallery.title">The Gallery</h1>
+    <p data-i18n="gallery.sub">One-of-a-kind pieces, each sold once and retired.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-cat="all" data-i18n="gallery.filter.all">All</button>
+      <button class="filter-btn" data-cat="portrait" data-i18n="gallery.filter.portrait">Portrait</button>
+      <button class="filter-btn" data-cat="landscape" data-i18n="gallery.filter.landscape">Landscape</button>
+      <button class="filter-btn" data-cat="abstract" data-i18n="gallery.filter.abstract">Abstract</button>
+      <button class="filter-btn" data-cat="nature" data-i18n="gallery.filter.nature">Nature</button>
+      <button class="filter-btn" data-cat="stilllife" data-i18n="gallery.filter.stilllife">Still Life</button>
+    </div>
+    <div class="grid" id="full-grid"></div>
+    <p id="empty-msg" style="display:none; color:var(--muted);"></p>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  let currentCat = params.get("cat") || "all";
+
+  async function draw() {
+    const all = await fetchProducts();
+    const list = currentCat === "all" ? all : all.filter((p) => p.category === currentCat);
+    renderGrid(document.getElementById("full-grid"), list);
+    document.getElementById("empty-msg").style.display = list.length ? "none" : "block";
+  }
+  document.querySelectorAll(".filter-btn").forEach((btn) => {
+    if (btn.dataset.cat === currentCat) btn.classList.add("active");
+    else btn.classList.remove("active");
+    btn.addEventListener("click", () => {
+      currentCat = btn.dataset.cat;
+      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      draw();
+    });
+  });
+  draw();
+  function onLangChangePage() { refreshDynamicTitles(); }
+</script>
+</body>
+</html>

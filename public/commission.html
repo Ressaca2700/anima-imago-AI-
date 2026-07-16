@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commission a Piece — Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="index.html#about" data-i18n="nav.about">About</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="commission.html" class="active" data-i18n="nav.commission">Commission a Piece</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <a class="cart-link" href="cart.html">
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1 id="page-title" data-i18n="commission.title">Commission a Piece</h1>
+    <p data-i18n="commission.sub">Every piece in the gallery is one of one — once it sells, it's gone. If you have something specific in mind, request a piece made just for you.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap" id="commission-root" style="max-width:640px;"></div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const root = document.getElementById("commission-root");
+  const qs = new URLSearchParams(location.search);
+
+  function money(n) { return "$" + Number(n).toFixed(0); }
+
+  async function renderForm() {
+    const t = I18N[getLang()];
+    let price = { price: 180, deposit: 90 };
+    try {
+      const r = await fetch("/api/commission");
+      price = await r.json();
+    } catch (e) { /* usa o padrão acima se a API não responder */ }
+
+    root.innerHTML = `
+      <div class="cart-summary" style="margin-bottom:28px;">
+        <div class="row"><span>${t["commission.price.label"]}</span><span>${money(price.price)}</span></div>
+        <p style="color:var(--muted); font-size:13px; margin-top:10px;">${t["commission.price.body"]}</p>
+      </div>
+      <div class="field"><label>${t["commission.name"]}</label><input type="text" id="c-name"></div>
+      <div class="field"><label>${t["commission.email"]}</label><input type="email" id="c-email"></div>
+      <div class="field"><label>${t["commission.brief"]}</label><textarea rows="5" id="c-brief" placeholder="${t["commission.brief.placeholder"]}"></textarea></div>
+      <div class="field"><label>${t["commission.style"]}</label><textarea rows="3" id="c-style" placeholder="${t["commission.style.placeholder"]}"></textarea></div>
+      <div class="field">
+        <label>${t["commission.reference"]}</label>
+        <input type="file" id="c-reference" accept="image/*">
+        <p style="color:var(--muted); font-size:12px; margin-top:6px;">${t["commission.reference.hint"]}</p>
+        <img id="c-reference-preview" style="display:none; width:160px; margin-top:10px; border:1px solid var(--border);">
+      </div>
+      <button class="btn btn-gold btn-full" id="c-submit" style="margin-top:8px;">${t["commission.submit"]} — ${money(price.deposit)}</button>
+      <p id="c-error" style="color:#b3453a; font-size:13px; margin-top:12px; display:none;"></p>
+      <p style="color:var(--muted); font-size:13px; margin-top:18px;">${t["commission.note"]}</p>
+    `;
+
+    let referenceImageData = null;
+    const refInput = document.getElementById("c-reference");
+    const refPreview = document.getElementById("c-reference-preview");
+    refInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) { referenceImageData = null; refPreview.style.display = "none"; return; }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        referenceImageData = ev.target.result;
+        refPreview.src = referenceImageData;
+        refPreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById("c-submit").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      const errEl = document.getElementById("c-error");
+      errEl.style.display = "none";
+
+      const payload = {
+        name: document.getElementById("c-name").value.trim(),
+        email: document.getElementById("c-email").value.trim(),
+        brief: document.getElementById("c-brief").value.trim(),
+        styleNotes: document.getElementById("c-style").value.trim(),
+        referenceImageBase64: referenceImageData || undefined,
+      };
+
+      btn.disabled = true;
+      btn.textContent = "…";
+      try {
+        const r = await fetch("/api/commission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || "Error.");
+        location.href = data.url; // leva para o pagamento seguro do sinal no Stripe
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = `${t["commission.submit"]} — ${money(price.deposit)}`;
+      }
+    });
+  }
+
+  async function pollCommissionStatus(sessionId, attempt) {
+    const t = I18N[getLang()];
+    const r = await fetch(`/api/commission-status?session_id=${encodeURIComponent(sessionId)}`);
+    const data = await r.json();
+
+    if (data.ready) {
+      root.innerHTML = `
+        <div class="success-box">
+          <div class="check">&#10003;</div>
+          <h2>${t["commission.success.title"]}</h2>
+          <p>${t["commission.success.body"]}</p>
+        </div>`;
+      return;
+    }
+    if (attempt > 15) {
+      root.innerHTML = `<div class="empty-state"><h2>${t["commission.success.title"]}</h2>
+        <p>${t["commission.confirming"]}</p></div>`;
+      return;
+    }
+    root.innerHTML = `<div class="empty-state"><p style="color:var(--muted);">${t["commission.confirming"]}</p></div>`;
+    setTimeout(() => pollCommissionStatus(sessionId, attempt + 1), 2000);
+  }
+
+  async function draw() {
+    if (qs.get("paid") === "1" && qs.get("session_id")) {
+      document.getElementById("page-title").textContent = I18N[getLang()]["commission.success.title"];
+      pollCommissionStatus(qs.get("session_id"), 0);
+    } else {
+      document.getElementById("page-title").textContent = I18N[getLang()]["commission.title"];
+      renderForm();
+    }
+  }
+  draw();
+  function onLangChangePage() { draw(); }
+</script>
+</body>
+</html>

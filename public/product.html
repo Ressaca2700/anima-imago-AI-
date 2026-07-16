@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="index.html#about" data-i18n="nav.about">About</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="commission.html" data-i18n="nav.commission">Commission a Piece</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <a class="cart-link" href="cart.html">
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:56px;">
+  <div class="wrap" id="product-root">
+    <p style="color:var(--muted);">Loading…</p>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const id = new URLSearchParams(location.search).get("id") || 0;
+  const root = document.getElementById("product-root");
+  let currentProduct = null;
+
+  async function render() {
+    currentProduct = await findProduct(id);
+    const p = currentProduct;
+    if (!p) {
+      root.innerHTML = '<div class="empty-state"><h2>Piece not found — it may already have been sold.</h2><a class="btn btn-outline" href="gallery.html">Back to gallery</a></div>';
+      return;
+    }
+    const t = I18N[getLang()];
+    root.innerHTML = `
+      <a class="back-link" href="gallery.html">&larr; ${t["product.back"]}</a>
+      <div class="product-layout" style="margin-top:18px;">
+        <div class="product-image protected"><img src="${p.img}" alt=""></div>
+        <div class="product-info">
+          <h1 class="js-title" data-pid="${p.id}">${productTitle(p)}</h1>
+          <div class="price">${money(p.price)}</div>
+          <p class="desc js-desc" data-pid="${p.id}">${productDesc(p)}</p>
+          <div class="product-actions">
+            <button class="btn btn-outline" id="add-cart">${t["product.addcart"]}</button>
+            <button class="btn btn-gold" id="buy-now">${t["product.buynow"]}</button>
+          </div>
+          <div class="product-meta">
+            <h4>${t["product.license.title"]}</h4>
+            <p>${t["product.license.body"]}</p>
+            <h4>${t["product.edition"]}</h4>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById("add-cart").addEventListener("click", () => {
+      addToCart(p.id);
+      document.getElementById("add-cart").textContent = "✓";
+      setTimeout(() => { document.getElementById("add-cart").textContent = I18N[getLang()]["product.addcart"]; }, 1200);
+    });
+    document.getElementById("buy-now").addEventListener("click", () => { location.href = "cart.html?buynow=" + p.id; });
+  }
+  render();
+  function onLangChangePage() { render(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos de Encomenda — Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .order-card { border: 1px solid var(--border); background: var(--bg-card); padding: 20px; margin-bottom: 18px; }
+  .order-card h3 { margin: 0 0 4px; }
+  .order-meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .order-status { display:inline-block; padding: 3px 10px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border-strong); margin-bottom: 12px; }
+  .order-field { margin-bottom: 10px; }
+  .order-field b { display:block; font-size:12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .order-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .link-box { font-size: 12px; word-break: break-all; background: var(--bg-alt); padding: 8px 10px; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="studio-orders.html" class="active">Pedidos de Encomenda</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Pedidos de Encomenda</h1>
+    <p>Acompanhe os pedidos de peças personalizadas, do sinal pago até a entrega.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="demo-note">Área restrita — mesma senha do Studio Upload.</div>
+    <div id="orders-root"><p style="color:var(--muted);">Carregando…</p></div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. All rights reserved.</span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const root = document.getElementById("orders-root");
+
+  const STATUS_LABELS = {
+    awaiting_deposit: "Aguardando sinal",
+    new: "Novo — sinal pago",
+    in_progress: "Em produção",
+    ready: "Pronta — aguardando entrega",
+    delivered: "Entregue",
+    cancelled: "Cancelada",
+  };
+
+  function getAdminPassword() {
+    let pw = sessionStorage.getItem("ai_admin_pw");
+    if (!pw) {
+      pw = prompt("Senha do estúdio:");
+      if (pw) sessionStorage.setItem("ai_admin_pw", pw);
+    }
+    return pw;
+  }
+
+  async function callAdmin(body) {
+    const password = getAdminPassword();
+    if (!password) throw new Error("Senha necessária.");
+    const r = await fetch("/api/admin-commissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password, ...body }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      if (r.status === 401) sessionStorage.removeItem("ai_admin_pw");
+      throw new Error(data.error || "Erro.");
+    }
+    return data;
+  }
+
+  function money(n) { return "$" + Number(n).toFixed(0); }
+
+  function renderOrders(commissions) {
+    if (!commissions.length) {
+      root.innerHTML = `<p style="color:var(--muted);">Nenhum pedido de encomenda ainda.</p>`;
+      return;
+    }
+    root.innerHTML = commissions.map((c) => `
+      <div class="order-card" data-id="${c.id}">
+        <span class="order-status">${STATUS_LABELS[c.status] || c.status}</span>
+        <h3>${c.customer_name}</h3>
+        <div class="order-meta">${c.customer_email} · ${new Date(c.created_at).toLocaleString("pt-BR")} · ${money(c.price)} (sinal ${money(c.deposit_amount)}${c.deposit_paid ? " — pago" : " — pendente"})</div>
+        <div class="order-field"><b>Descrição pedida</b>${c.brief}</div>
+        ${c.style_notes ? `<div class="order-field"><b>Referências de estilo</b>${c.style_notes}</div>` : ""}
+        ${c.reference_image_url ? `<div class="order-field"><b>Imagem de referência</b><a href="${c.reference_image_url}" target="_blank"><img src="${c.reference_image_url}" style="width:140px; border:1px solid var(--border); display:block; margin-top:4px;"></a></div>` : ""}
+        ${c.delivery_link ? `<div class="link-box">${c.delivery_link}</div>` : ""}
+        <div class="order-actions">
+          ${c.status === "new" ? `<button class="btn btn-outline btn-sm" data-action="in_progress">Marcar Em Produção</button>` : ""}
+          ${(c.status === "new" || c.status === "in_progress") ? `
+            <label class="btn btn-gold btn-sm" style="cursor:pointer;">
+              Enviar peça final
+              <input type="file" accept="image/*" style="display:none;" data-deliver-input>
+            </label>` : ""}
+          ${c.status === "ready" ? `<button class="btn btn-outline btn-sm" data-action="delivered">Marcar como Entregue</button>` : ""}
+        </div>
+        <p class="deliver-error" style="color:#b3453a; font-size:13px; margin-top:8px; display:none;"></p>
+      </div>
+    `).join("");
+
+    root.querySelectorAll(".order-card").forEach((card) => {
+      const id = Number(card.dataset.id);
+
+      card.querySelectorAll("[data-action]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          try {
+            await callAdmin({ action: "update-status", id, status: btn.dataset.action });
+            await load();
+          } catch (err) {
+            showError(card, err.message);
+            btn.disabled = false;
+          }
+        });
+      });
+
+      const fileInput = card.querySelector("[data-deliver-input]");
+      if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = async (ev) => {
+            try {
+              await callAdmin({ action: "deliver", id, imageBase64: ev.target.result });
+              await load();
+            } catch (err) {
+              showError(card, err.message);
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+
+    function showError(card, msg) {
+      const el = card.querySelector(".deliver-error");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+  }
+
+  async function load() {
+    try {
+      const data = await callAdmin({ action: "list" });
+      renderOrders(data.commissions);
+    } catch (err) {
+      root.innerHTML = `<p style="color:#b3453a;">${err.message}</p>`;
+    }
+  }
+  load();
+</script>
+</body>
+</html>

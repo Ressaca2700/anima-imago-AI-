@@ -1,0 +1,7 @@
+{
+  "name": "anima-imago",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anima Imago — loja de fotografias criadas com IA, cada peça vendida uma única vez.",
+  "engines": { "node": ">=20" }
+}

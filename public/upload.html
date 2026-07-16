@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Upload — Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="index.html#about" data-i18n="nav.about">About</a>
+      <a href="upload.html" class="active" data-i18n="nav.upload">Studio Upload</a>
+      <a href="commission.html" data-i18n="nav.commission">Commission a Piece</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <a class="cart-link" href="cart.html">
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1 data-i18n="upload.title">Studio Upload</h1>
+    <p data-i18n="upload.sub">Add a new original to the collection.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="demo-note">Esta área é restrita — só quem tem a senha do estúdio consegue publicar peças novas. <a href="studio-orders.html">Ver pedidos de encomenda →</a></div>
+
+    <div class="upload-layout">
+      <div>
+        <div class="dropzone" id="dropzone">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+          <div data-i18n="upload.dropzone">Drag &amp; drop your image here, or click to browse</div>
+          <input type="file" id="file-input" accept="image/*" style="display:none;">
+        </div>
+        <img id="preview-img" style="display:none; width:100%; aspect-ratio:4/5; object-fit:cover; margin-bottom:24px; border:1px solid var(--border);">
+
+        <div class="field">
+          <label data-i18n="upload.pricefield">Price (USD)</label>
+          <input type="number" id="f-price" placeholder="72">
+        </div>
+        <div class="field">
+          <label data-i18n="upload.categoryfield">Category</label>
+          <select id="f-category">
+            <option value="portrait" data-i18n="gallery.filter.portrait">Portrait</option>
+            <option value="landscape" data-i18n="gallery.filter.landscape">Landscape</option>
+            <option value="abstract" data-i18n="gallery.filter.abstract">Abstract</option>
+            <option value="nature" data-i18n="gallery.filter.nature">Nature</option>
+            <option value="stilllife" data-i18n="gallery.filter.stilllife">Still Life</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="en">EN</button>
+          <button class="tab-btn" data-tab="es">ES</button>
+          <button class="tab-btn" data-tab="zh">中文</button>
+        </div>
+        <div class="tab-panel active" data-panel="en">
+          <div class="field"><label>Title</label><input type="text" id="f-title-en" placeholder="Gilded Reverie"></div>
+          <div class="field"><label>Description</label><textarea rows="5" id="f-desc-en" placeholder="A slow wash of amber light..."></textarea></div>
+        </div>
+        <div class="tab-panel" data-panel="es">
+          <div class="field"><label>Título</label><input type="text" id="f-title-es" placeholder="Ensueño Dorado"></div>
+          <div class="field"><label>Descripción</label><textarea rows="5" id="f-desc-es" placeholder="Un lento baño de luz ámbar..."></textarea></div>
+        </div>
+        <div class="tab-panel" data-panel="zh">
+          <div class="field"><label>标题</label><input type="text" id="f-title-zh" placeholder="金色遐想"></div>
+          <div class="field"><label>描述</label><textarea rows="5" id="f-desc-zh" placeholder="缓缓流淌的琥珀光..."></textarea></div>
+        </div>
+        <button class="btn btn-gold btn-full" id="publish-btn" data-i18n="upload.publish" style="margin-top:8px;">Publish to Gallery</button>
+        <p id="publish-error" style="color:#b3453a; font-size:13px; margin-top:12px; display:none;"></p>
+        <div id="publish-success" style="display:none; margin-top:18px; border:1px solid var(--border-strong); background:var(--bg-card); padding:18px; text-align:center;">
+          <p style="margin:0 0 12px; color:var(--text);" id="publish-success-msg">Published!</p>
+          <a class="btn btn-outline" id="publish-view-link" href="gallery.html">View in Gallery</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const dz = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-input");
+  const preview = document.getElementById("preview-img");
+  let uploadedImageData = null;
+
+  dz.addEventListener("click", () => fileInput.click());
+  ["dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("dragover"); }));
+  ["dragleave", "drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove("dragover"); }));
+  dz.addEventListener("drop", (e) => { if (e.dataTransfer.files[0]) showPreview(e.dataTransfer.files[0]); });
+  fileInput.addEventListener("change", (e) => { if (e.target.files[0]) showPreview(e.target.files[0]); });
+
+  function showPreview(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImageData = e.target.result;
+      preview.src = uploadedImageData;
+      preview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.dataset.panel === btn.dataset.tab));
+    });
+  });
+
+  function getAdminPassword() {
+    let pw = sessionStorage.getItem("ai_admin_pw");
+    if (!pw) {
+      pw = prompt("Senha do estúdio:");
+      if (pw) sessionStorage.setItem("ai_admin_pw", pw);
+    }
+    return pw;
+  }
+
+  document.getElementById("publish-btn").addEventListener("click", async () => {
+    const errEl = document.getElementById("publish-error");
+    errEl.style.display = "none";
+    const titleEn = document.getElementById("f-title-en").value.trim();
+    const price = parseFloat(document.getElementById("f-price").value) || 0;
+
+    if (!uploadedImageData) return showError("Please choose an image first.");
+    if (!titleEn) return showError("Please add at least the English title.");
+
+    const password = getAdminPassword();
+    if (!password) return;
+
+    const btn = document.getElementById("publish-btn");
+    btn.disabled = true;
+    btn.textContent = "…";
+
+    try {
+      const r = await fetch("/api/admin-publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password,
+          title_en: titleEn,
+          title_es: document.getElementById("f-title-es").value.trim(),
+          title_zh: document.getElementById("f-title-zh").value.trim(),
+          desc_en: document.getElementById("f-desc-en").value.trim(),
+          desc_es: document.getElementById("f-desc-es").value.trim(),
+          desc_zh: document.getElementById("f-desc-zh").value.trim(),
+          price, category: document.getElementById("f-category").value,
+          imageBase64: uploadedImageData,
+        }),
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        if (r.status === 401) sessionStorage.removeItem("ai_admin_pw");
+        throw new Error(data.error || "Erro ao publicar.");
+      }
+      document.getElementById("publish-success-msg").textContent = I18N[getLang()]["upload.publish"] + " — " + titleEn;
+      document.getElementById("publish-view-link").href = "product.html?id=" + data.product.id;
+      document.getElementById("publish-success").style.display = "block";
+      await fetchProducts(true); // atualiza o cache local
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = I18N[getLang()]["upload.publish"];
+    }
+
+    function showError(msg) { errEl.textContent = msg; errEl.style.display = "block"; }
+  });
+
+  function onLangChangePage() {}
+</script>
+</body>
+</html>

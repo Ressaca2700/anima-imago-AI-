@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anima Imago — AI-Crafted Photography</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="index.html#about" data-i18n="nav.about">About</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="commission.html" data-i18n="nav.commission">Commission a Piece</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <a class="cart-link" href="cart.html">
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section class="hero" style="background-image: url('assets/gallery/piece-01.jpg');">
+  <div class="hero-content">
+    <span class="hero-tag" data-i18n="hero.tag">AI-Crafted Photography</span>
+    <h1 data-i18n="hero.title">Where imagination becomes image.</h1>
+    <p data-i18n="hero.sub">Every piece in this collection is generated, curated, and released once — a single original, never repeated.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="gallery.html" data-i18n="hero.cta">Explore the Collection</a>
+      <a class="btn btn-outline" href="index.html#how" data-i18n="hero.cta2">How it works</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2 data-i18n="section.featured">Recent Visions</h2>
+        <p data-i18n="section.featured.sub">Newly released, one-of-a-kind pieces.</p>
+      </div>
+      <a class="btn btn-outline" href="gallery.html" data-i18n="section.viewall">View full gallery</a>
+    </div>
+    <div class="grid" id="featured-grid"></div>
+  </div>
+</section>
+
+<section id="about" style="background: var(--bg-alt);">
+  <div class="wrap about-block">
+    <img src="assets/gallery/piece-09.jpg" alt="">
+    <div>
+      <span class="eyebrow" data-i18n="hero.tag">AI-Crafted Photography</span>
+      <h2 data-i18n="section.about.title">Born from the mind, not the lens</h2>
+      <p data-i18n="section.about.body">Anima Imago is a gallery of photographs that never passed through a camera. Each work begins as a thought — refined through generative AI, hand-selected, and released as a single edition. When a piece sells, it is retired. What you own is the only copy that will ever exist.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 data-i18n="section.how.title">How it works</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <span class="num">01</span>
+        <h3 data-i18n="how.1.title">Discover</h3>
+        <p data-i18n="how.1.body">Browse a constantly evolving collection of AI-generated originals.</p>
+      </div>
+      <div class="how-step">
+        <span class="num">02</span>
+        <h3 data-i18n="how.2.title">Purchase</h3>
+        <p data-i18n="how.2.body">Buy securely. Once sold, a piece is removed from the gallery forever.</p>
+      </div>
+      <div class="how-step">
+        <span class="num">03</span>
+        <h3 data-i18n="how.3.title">Download</h3>
+        <p data-i18n="how.3.body">Receive your full-resolution, watermark-free file instantly after payment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</div>
+        <div class="tagline" data-i18n="footer.tag">Every image, imagined once.</div>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4 data-i18n="nav.gallery">Gallery</h4>
+          <a href="gallery.html" data-i18n="gallery.filter.all">All</a>
+          <a href="gallery.html?cat=portrait" data-i18n="gallery.filter.portrait">Portrait</a>
+          <a href="gallery.html?cat=landscape" data-i18n="gallery.filter.landscape">Landscape</a>
+          <a href="gallery.html?cat=abstract" data-i18n="gallery.filter.abstract">Abstract</a>
+          <a href="gallery.html?cat=nature" data-i18n="gallery.filter.nature">Nature</a>
+          <a href="gallery.html?cat=stilllife" data-i18n="gallery.filter.stilllife">Still Life</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="nav.about">About</h4>
+          <a href="index.html#about" data-i18n="section.about.title">Born from the mind, not the lens</a>
+          <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+          <a href="commission.html" data-i18n="nav.commission">Commission a Piece</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+  (async () => {
+    const products = await fetchProducts();
+    renderGrid(document.getElementById("featured-grid"), products.slice(0, 8));
+  })();
+  function onLangChangePage() { refreshDynamicTitles(); }
+</script>
+</body>
+</html>

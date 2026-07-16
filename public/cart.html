@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart — Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="index.html#about" data-i18n="nav.about">About</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="commission.html" data-i18n="nav.commission">Commission a Piece</a>
+    </nav>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <a class="cart-link" href="cart.html">
+        <span data-i18n="nav.cart">Cart</span>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1 id="page-title" data-i18n="cart.title">Your Cart</h1>
+  </div>
+</div>
+
+<section id="cart-section">
+  <div class="wrap" id="cart-root"></div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. <span data-i18n="footer.rights">All rights reserved.</span></span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const root = document.getElementById("cart-root");
+  const qs = new URLSearchParams(location.search);
+
+  if (qs.get("buynow")) {
+    addToCart(Number(qs.get("buynow")));
+    history.replaceState({}, "", "cart.html");
+  }
+
+  async function renderCartStage() {
+    const t = I18N[getLang()];
+    const ids = getCart();
+    const all = await fetchProducts();
+    const items = ids.map((id) => all.find((p) => p.id === id)).filter(Boolean);
+
+    if (items.length === 0) {
+      root.innerHTML = `<div class="empty-state"><h2>${t["cart.empty"]}</h2>
+        <a class="btn btn-outline" href="gallery.html">${t["cart.browse"]}</a></div>`;
+      return;
+    }
+    const total = items.reduce((s, p) => s + p.price, 0);
+    root.innerHTML = `
+      <div class="cart-layout">
+        <div>
+          ${items.map((p) => `
+            <div class="cart-item">
+              <img src="${p.img}" alt="">
+              <div>
+                <h3>${productTitle(p)}</h3>
+                <div class="sub">${t["product.edition"]}</div>
+              </div>
+              <div class="price">${money(p.price)}</div>
+              <button class="remove-btn" data-remove="${p.id}">${t["cart.remove"]}</button>
+            </div>
+          `).join("")}
+        </div>
+        <div class="cart-summary">
+          <div class="row"><span>${t["cart.subtotal"]}</span><span>${money(total)}</span></div>
+          <div class="row total"><span>Total</span><span>${money(total)}</span></div>
+          <button class="btn btn-gold btn-full" id="to-checkout" style="margin-top:10px;">${t["cart.checkout"]}</button>
+          <p id="checkout-error" style="color:#b3453a; font-size:13px; margin-top:12px; display:none;"></p>
+        </div>
+      </div>
+    `;
+    root.querySelectorAll("[data-remove]").forEach((btn) => {
+      btn.addEventListener("click", () => { removeFromCart(Number(btn.dataset.remove)); renderCartStage(); });
+    });
+    document.getElementById("to-checkout").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      btn.textContent = "…";
+      try {
+        const r = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productIds: getCart() }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || "Erro ao iniciar pagamento.");
+        location.href = data.url; // leva para a página de pagamento segura do Stripe
+      } catch (err) {
+        const errEl = document.getElementById("checkout-error");
+        errEl.textContent = err.message;
+        errEl.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = t["cart.checkout"];
+      }
+    });
+  }
+
+  async function pollOrderStatus(sessionId, attempt) {
+    const t = I18N[getLang()];
+    const r = await fetch(`/api/order-status?session_id=${encodeURIComponent(sessionId)}`);
+    const data = await r.json();
+
+    if (data.ready) {
+      saveCart([]);
+      root.innerHTML = `
+        <div class="success-box">
+          <div class="check">&#10003;</div>
+          <h2>${t["checkout.success.title"]}</h2>
+          <p>${t["checkout.success.body"]}</p>
+          ${data.items.map((it) => `<a class="btn btn-gold" style="margin:6px;" href="/api/download?token=${it.token}">${t["checkout.download"]}${it.title ? " — " + (it.title[getLang()] || it.title.en) : ""}</a>`).join("<br>")}
+        </div>`;
+      return;
+    }
+    if (attempt > 15) {
+      root.innerHTML = `<div class="empty-state"><h2>${t["checkout.success.title"]}</h2>
+        <p>Ainda confirmando o pagamento — atualize esta página em alguns segundos.</p></div>`;
+      return;
+    }
+    root.innerHTML = `<div class="empty-state"><p style="color:var(--muted);">Confirmando pagamento…</p></div>`;
+    setTimeout(() => pollOrderStatus(sessionId, attempt + 1), 2000);
+  }
+
+  async function draw() {
+    if (qs.get("paid") === "1" && qs.get("session_id")) {
+      document.getElementById("page-title").textContent = I18N[getLang()]["checkout.success.title"];
+      pollOrderStatus(qs.get("session_id"), 0);
+    } else {
+      document.getElementById("page-title").textContent = I18N[getLang()]["cart.title"];
+      renderCartStage();
+    }
+  }
+  draw();
+  function onLangChangePage() { draw(); }
+</script>
+</body>
+</html>
