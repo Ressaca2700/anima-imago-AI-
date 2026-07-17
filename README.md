@@ -29,13 +29,14 @@ seed.js             → popula o banco com as 14 peças de exemplo do protótipo
 Veja `.env.example`. Todas precisam ser configuradas no painel da Vercel
 (Project Settings → Environment Variables) antes do primeiro deploy real.
 
-## Rodar o "seed" (peças de exemplo)
+## Popular as 14 peças de exemplo
 
-Depois de configurar `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`:
+Depois do primeiro deploy, vá em `/upload.html`, digite a senha do estúdio, e
+clique no botão **"Popular com as 14 peças de exemplo"** — isso publica as
+peças de exemplo do protótipo direto no banco, sem precisar de terminal.
 
-```bash
-SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node seed.js
-```
+(Alternativa via terminal, para quem preferir: `SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=... node seed.js`.)
 
 ## Webhook do Stripe
 

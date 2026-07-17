@@ -45,6 +45,10 @@
 <section>
   <div class="wrap">
     <div class="demo-note">Esta área é restrita — só quem tem a senha do estúdio consegue publicar peças novas. <a href="studio-orders.html">Ver pedidos de encomenda →</a></div>
+    <div class="demo-note">
+      Primeira vez publicando o site? <button id="seed-btn" class="btn btn-outline btn-sm" type="button" style="margin-left:8px;">Popular com as 14 peças de exemplo</button>
+      <span id="seed-result" style="display:block; margin-top:8px; font-size:13px;"></span>
+    </div>
 
     <div class="upload-layout">
       <div>
@@ -115,7 +119,7 @@
   const dz = document.getElementById("dropzone");
   const fileInput = document.getElementById("file-input");
   const preview = document.getElementById("preview-img");
-  let uploadedImageData = null;
+  let uploadedFile = null;
 
   dz.addEventListener("click", () => fileInput.click());
   ["dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("dragover"); }));
@@ -124,13 +128,34 @@
   fileInput.addEventListener("change", (e) => { if (e.target.files[0]) showPreview(e.target.files[0]); });
 
   function showPreview(file) {
+    uploadedFile = file;
     const reader = new FileReader();
     reader.onload = (e) => {
-      uploadedImageData = e.target.result;
-      preview.src = uploadedImageData;
+      preview.src = e.target.result;
       preview.style.display = "block";
     };
     reader.readAsDataURL(file);
+  }
+
+  // Envia o arquivo direto para o Supabase (não passa pela nossa função,
+  // então fotos grandes não esbarram no limite de tamanho da Vercel).
+  async function uploadFileDirect(password, file, prefix) {
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const r = await fetch("/api/admin-upload-url", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password, ext, prefix }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Erro ao preparar o envio.");
+
+    const fd = new FormData();
+    fd.append("cacheControl", "3600");
+    fd.append("file", file);
+    const uploadRes = await fetch(data.uploadUrl, { method: "PUT", body: fd });
+    if (!uploadRes.ok) throw new Error("Erro ao enviar a imagem (" + uploadRes.status + ").");
+
+    return data.path;
   }
 
   document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -155,7 +180,7 @@
     const titleEn = document.getElementById("f-title-en").value.trim();
     const price = parseFloat(document.getElementById("f-price").value) || 0;
 
-    if (!uploadedImageData) return showError("Please choose an image first.");
+    if (!uploadedFile) return showError("Please choose an image first.");
     if (!titleEn) return showError("Please add at least the English title.");
 
     const password = getAdminPassword();
@@ -166,6 +191,8 @@
     btn.textContent = "…";
 
     try {
+      const imagePath = await uploadFileDirect(password, uploadedFile, "pieces");
+
       const r = await fetch("/api/admin-publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -178,7 +205,7 @@
           desc_es: document.getElementById("f-desc-es").value.trim(),
           desc_zh: document.getElementById("f-desc-zh").value.trim(),
           price, category: document.getElementById("f-category").value,
-          imageBase64: uploadedImageData,
+          imagePath,
         }),
       });
       const data = await r.json();
@@ -198,6 +225,32 @@
     }
 
     function showError(msg) { errEl.textContent = msg; errEl.style.display = "block"; }
+  });
+
+  document.getElementById("seed-btn").addEventListener("click", async () => {
+    const resultEl = document.getElementById("seed-result");
+    const password = getAdminPassword();
+    if (!password) return;
+    resultEl.style.color = "var(--muted)";
+    resultEl.textContent = "Publicando as 14 peças de exemplo… isso leva um minuto.";
+    try {
+      const r = await fetch("/api/admin-seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        if (r.status === 401) sessionStorage.removeItem("ai_admin_pw");
+        throw new Error(data.error || "Erro ao popular peças.");
+      }
+      resultEl.style.color = "var(--gold)";
+      resultEl.textContent = `Pronto! ${data.published.length} peças publicadas: ${data.published.join(", ")}`;
+      await fetchProducts(true);
+    } catch (err) {
+      resultEl.style.color = "#b3453a";
+      resultEl.textContent = err.message;
+    }
   });
 
   function onLangChangePage() {}

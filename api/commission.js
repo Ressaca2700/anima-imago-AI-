@@ -1,6 +1,5 @@
-const crypto = require("crypto");
 const { readJsonBody, sendJson, methodNotAllowed } = require("./_lib/http");
-const { insertCommission, updateCommissionSession, uploadImage } = require("./_lib/supabase");
+const { insertCommission, updateCommissionSession } = require("./_lib/supabase");
 const { createCheckoutSession } = require("./_lib/stripe");
 
 // GET  -> devolve o preço atual da encomenda (para mostrar na página antes de o cliente pedir).
@@ -26,23 +25,9 @@ module.exports = async (req, res) => {
     if (!email || !email.includes("@")) return sendJson(res, 400, { error: "Please enter a valid email." });
     if (!brief || brief.length < 10) return sendJson(res, 400, { error: "Please describe the piece you'd like — a few sentences is great." });
 
-    // Imagem de referência é opcional — o cliente pode anexar um exemplo do que tem em mente.
-    let referenceImagePath = null;
-    if (body.referenceImageBase64) {
-      const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(body.referenceImageBase64);
-      if (!match) return sendJson(res, 400, { error: "Invalid reference image format." });
-      const contentType = match[1];
-      const buffer = Buffer.from(match[2], "base64");
-
-      const MAX_BYTES = 6 * 1024 * 1024; // 6MB — é só uma referência, não o arquivo final
-      if (buffer.length > MAX_BYTES) {
-        return sendJson(res, 400, { error: "Reference image is too large (max 6MB)." });
-      }
-
-      const ext = contentType.split("/")[1].replace("jpeg", "jpg");
-      referenceImagePath = `commissions/references/${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
-      await uploadImage(referenceImagePath, buffer, contentType);
-    }
+    // Imagem de referência é opcional — já foi enviada direto ao Supabase pelo
+    // navegador (via /api/commission-upload-url), aqui só recebemos o caminho.
+    const referenceImagePath = body.referenceImagePath || null;
 
     const commission = await insertCommission({
       customer_name: name,

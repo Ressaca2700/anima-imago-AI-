@@ -91,16 +91,16 @@
       <p style="color:var(--muted); font-size:13px; margin-top:18px;">${t["commission.note"]}</p>
     `;
 
-    let referenceImageData = null;
+    let referenceFile = null;
     const refInput = document.getElementById("c-reference");
     const refPreview = document.getElementById("c-reference-preview");
     refInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
-      if (!file) { referenceImageData = null; refPreview.style.display = "none"; return; }
+      if (!file) { referenceFile = null; refPreview.style.display = "none"; return; }
+      referenceFile = file;
       const reader = new FileReader();
       reader.onload = (ev) => {
-        referenceImageData = ev.target.result;
-        refPreview.src = referenceImageData;
+        refPreview.src = ev.target.result;
         refPreview.style.display = "block";
       };
       reader.readAsDataURL(file);
@@ -111,17 +111,36 @@
       const errEl = document.getElementById("c-error");
       errEl.style.display = "none";
 
-      const payload = {
-        name: document.getElementById("c-name").value.trim(),
-        email: document.getElementById("c-email").value.trim(),
-        brief: document.getElementById("c-brief").value.trim(),
-        styleNotes: document.getElementById("c-style").value.trim(),
-        referenceImageBase64: referenceImageData || undefined,
-      };
-
       btn.disabled = true;
       btn.textContent = "…";
       try {
+        let referenceImagePath;
+        if (referenceFile) {
+          const ext = (referenceFile.name.split(".").pop() || "jpg").toLowerCase();
+          const urlRes = await fetch("/api/commission-upload-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ext }),
+          });
+          const urlData = await urlRes.json();
+          if (!urlRes.ok) throw new Error(urlData.error || "Error preparing upload.");
+
+          const fd = new FormData();
+          fd.append("cacheControl", "3600");
+          fd.append("file", referenceFile);
+          const uploadRes = await fetch(urlData.uploadUrl, { method: "PUT", body: fd });
+          if (!uploadRes.ok) throw new Error("Error uploading reference image (" + uploadRes.status + ").");
+          referenceImagePath = urlData.path;
+        }
+
+        const payload = {
+          name: document.getElementById("c-name").value.trim(),
+          email: document.getElementById("c-email").value.trim(),
+          brief: document.getElementById("c-brief").value.trim(),
+          styleNotes: document.getElementById("c-style").value.trim(),
+          referenceImagePath,
+        };
+
         const r = await fetch("/api/commission", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

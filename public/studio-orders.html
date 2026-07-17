@@ -140,19 +140,32 @@
 
       const fileInput = card.querySelector("[data-deliver-input]");
       if (fileInput) {
-        fileInput.addEventListener("change", (e) => {
+        fileInput.addEventListener("change", async (e) => {
           const file = e.target.files[0];
           if (!file) return;
-          const reader = new FileReader();
-          reader.onload = async (ev) => {
-            try {
-              await callAdmin({ action: "deliver", id, imageBase64: ev.target.result });
-              await load();
-            } catch (err) {
-              showError(card, err.message);
-            }
-          };
-          reader.readAsDataURL(file);
+          try {
+            const password = getAdminPassword();
+            if (!password) return;
+            const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+            const urlRes = await fetch("/api/admin-upload-url", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ password, ext, prefix: "commissions" }),
+            });
+            const urlData = await urlRes.json();
+            if (!urlRes.ok) throw new Error(urlData.error || "Erro ao preparar o envio.");
+
+            const fd = new FormData();
+            fd.append("cacheControl", "3600");
+            fd.append("file", file);
+            const uploadRes = await fetch(urlData.uploadUrl, { method: "PUT", body: fd });
+            if (!uploadRes.ok) throw new Error("Erro ao enviar a imagem (" + uploadRes.status + ").");
+
+            await callAdmin({ action: "deliver", id, imagePath: urlData.path });
+            await load();
+          } catch (err) {
+            showError(card, err.message);
+          }
         });
       }
     });

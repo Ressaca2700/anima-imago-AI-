@@ -228,6 +228,23 @@ async function uploadImage(path, buffer, contentType) {
   return path;
 }
 
+// Gera um link temporário para o NAVEGADOR enviar o arquivo direto para o Supabase,
+// sem passar pelas nossas funções — necessário porque a Vercel tem um limite de
+// tamanho (4,5MB) para o que passa pelas funções, e fotos em alta resolução passam
+// disso facilmente.
+async function createSignedUploadUrl(path) {
+  assertConfigured();
+  const url = `${SUPABASE_URL}/storage/v1/object/upload/sign/${BUCKET}/${path}`;
+  const r = await fetch(url, {
+    method: "POST",
+    headers: restHeaders(),
+    body: JSON.stringify({}),
+  });
+  if (!r.ok) throw new Error(`Supabase createSignedUploadUrl falhou: ${r.status} ${await r.text()}`);
+  const data = await r.json();
+  return { uploadUrl: `${SUPABASE_URL}/storage/v1${data.url}`, token: data.token };
+}
+
 async function signedUrl(path, expiresInSeconds) {
   assertConfigured();
   const url = `${SUPABASE_URL}/storage/v1/object/sign/${BUCKET}/${path}`;
@@ -252,6 +269,7 @@ module.exports = {
   getDownloadByToken,
   uploadImage,
   signedUrl,
+  createSignedUploadUrl,
   insertCommission,
   updateCommissionSession,
   markCommissionDepositPaidBySession,

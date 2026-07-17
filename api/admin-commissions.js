@@ -5,7 +5,6 @@ const {
   getCommission,
   updateCommissionStatus,
   setCommissionDelivery,
-  uploadImage,
   signedUrl,
 } = require("./_lib/supabase");
 
@@ -54,27 +53,13 @@ module.exports = async (req, res) => {
 
     if (action === "deliver") {
       if (!body.id) return sendJson(res, 400, { error: "id é obrigatório." });
-      if (!body.imageBase64) return sendJson(res, 400, { error: "Envie a imagem final." });
+      if (!body.imagePath) return sendJson(res, 400, { error: "Envie a imagem final." });
 
       const commission = await getCommission(body.id);
       if (!commission) return sendJson(res, 404, { error: "Encomenda não encontrada." });
 
-      const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(body.imageBase64);
-      if (!match) return sendJson(res, 400, { error: "Formato de imagem inválido." });
-      const contentType = match[1];
-      const buffer = Buffer.from(match[2], "base64");
-
-      const MAX_BYTES = 12 * 1024 * 1024; // 12MB — arquivo final pode ser maior que a pré-visualização
-      if (buffer.length > MAX_BYTES) {
-        return sendJson(res, 400, { error: "Imagem muito grande (máximo 12MB)." });
-      }
-
-      const ext = contentType.split("/")[1].replace("jpeg", "jpg");
-      const path = `commissions/${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
-      await uploadImage(path, buffer, contentType);
-
       const token = crypto.randomBytes(24).toString("hex");
-      const updated = await setCommissionDelivery(body.id, path, token);
+      const updated = await setCommissionDelivery(body.id, body.imagePath, token);
 
       const siteUrl = process.env.SITE_URL || `https://${req.headers.host}`;
       return sendJson(res, 200, {
