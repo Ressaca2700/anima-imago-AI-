@@ -52,6 +52,35 @@ async function insertProduct(product) {
   return rows[0];
 }
 
+async function listAllProducts() {
+  assertConfigured();
+  const url = `${SUPABASE_URL}/rest/v1/products?order=created_at.desc`;
+  const r = await fetch(url, { headers: restHeaders() });
+  if (!r.ok) throw new Error(`Supabase listAllProducts falhou: ${r.status} ${await r.text()}`);
+  return r.json();
+}
+
+async function updateProduct(id, fields) {
+  assertConfigured();
+  const url = `${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
+  const r = await fetch(url, {
+    method: "PATCH",
+    headers: restHeaders({ Prefer: "return=representation" }),
+    body: JSON.stringify(fields),
+  });
+  if (!r.ok) throw new Error(`Supabase updateProduct falhou: ${r.status} ${await r.text()}`);
+  const rows = await r.json();
+  return rows[0];
+}
+
+async function deleteProduct(id) {
+  assertConfigured();
+  const url = `${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
+  const r = await fetch(url, { method: "DELETE", headers: restHeaders() });
+  if (!r.ok) throw new Error(`Supabase deleteProduct falhou: ${r.status} ${await r.text()}`);
+  return true;
+}
+
 async function markProductSold(id) {
   assertConfigured();
   const url = `${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
@@ -260,8 +289,11 @@ async function signedUrl(path, expiresInSeconds) {
 
 module.exports = {
   listUnsoldProducts,
+  listAllProducts,
   getProduct,
   insertProduct,
+  updateProduct,
+  deleteProduct,
   markProductSold,
   insertDownload,
   markDownloadPaidBySession,

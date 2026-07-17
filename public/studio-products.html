@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerenciar Peças — Anima Imago</title>
+<link rel="icon" href="assets/icons/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .prod-card { border: 1px solid var(--border); background: var(--bg-card); padding: 20px; margin-bottom: 18px; display: grid; grid-template-columns: 140px 1fr; gap: 20px; }
+  .prod-card img { width: 140px; height: 175px; object-fit: cover; border: 1px solid var(--border); }
+  .prod-status { display:inline-block; padding: 3px 10px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border-strong); margin-bottom: 10px; }
+  .prod-status.sold { color: #b3453a; border-color: #b3453a; }
+  .prod-status.available { color: var(--gold); border-color: var(--gold); }
+  .prod-field { margin-bottom: 10px; }
+  .prod-field label { display:block; font-size:11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .prod-field input, .prod-field select, .prod-field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); background: var(--bg); font-family: inherit; font-size: 14px; }
+  .prod-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .prod-actions { margin-top: 12px; display: flex; gap: 10px; align-items: center; }
+  .prod-msg { font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/logo.svg" alt="Anima Imago">
+      <span class="name"><span class="accent-letter">A</span>nima <span class="accent-letter">I</span>mago</span>
+    </a>
+    <nav class="main-nav">
+      <a href="gallery.html" data-i18n="nav.gallery">Gallery</a>
+      <a href="upload.html" data-i18n="nav.upload">Studio Upload</a>
+      <a href="studio-orders.html">Pedidos de Encomenda</a>
+      <a href="studio-products.html" class="active">Gerenciar Peças</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Gerenciar Peças</h1>
+    <p>Corrija texto, preço ou categoria, ou remova uma peça publicada. Peças vendidas somem da galeria automaticamente — aqui você ainda pode vê-las e removê-las se quiser.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="demo-note">Área restrita — mesma senha do Studio Upload.</div>
+    <div id="products-root"><p style="color:var(--muted);">Carregando…</p></div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Anima Imago. All rights reserved.</span>
+      <span>mariliaferraz@me.com</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const root = document.getElementById("products-root");
+  const CATEGORIES = ["portrait", "landscape", "abstract", "nature", "stilllife"];
+
+  function getAdminPassword() {
+    let pw = sessionStorage.getItem("ai_admin_pw");
+    if (!pw) {
+      pw = prompt("Senha do estúdio:");
+      if (pw) sessionStorage.setItem("ai_admin_pw", pw);
+    }
+    return pw;
+  }
+
+  async function callAdmin(body) {
+    const password = getAdminPassword();
+    if (!password) throw new Error("Senha necessária.");
+    const r = await fetch("/api/admin-publish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password, ...body }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      if (r.status === 401) sessionStorage.removeItem("ai_admin_pw");
+      throw new Error(data.error || "Erro.");
+    }
+    return data;
+  }
+
+  function money(n) { return "$" + Number(n).toFixed(0); }
+
+  function renderProducts(products) {
+    if (!products.length) {
+      root.innerHTML = `<p style="color:var(--muted);">Nenhuma peça publicada ainda.</p>`;
+      return;
+    }
+    root.innerHTML = products.map((p) => `
+      <div class="prod-card" data-id="${p.id}">
+        <img src="${p.img}" alt="">
+        <div>
+          <span class="prod-status ${p.sold ? "sold" : "available"}">${p.sold ? "Vendida" : "Disponível"}</span>
+          <div class="prod-row">
+            <div class="prod-field"><label>Título (EN)</label><input type="text" data-field="title_en" value="${(p.title_en || "").replace(/"/g, "&quot;")}"></div>
+            <div class="prod-field"><label>Título (ES)</label><input type="text" data-field="title_es" value="${(p.title_es || "").replace(/"/g, "&quot;")}"></div>
+            <div class="prod-field"><label>标题 (ZH)</label><input type="text" data-field="title_zh" value="${(p.title_zh || "").replace(/"/g, "&quot;")}"></div>
+          </div>
+          <div class="prod-row">
+            <div class="prod-field"><label>Descrição (EN)</label><textarea rows="2" data-field="desc_en">${p.desc_en || ""}</textarea></div>
+            <div class="prod-field"><label>Descripción (ES)</label><textarea rows="2" data-field="desc_es">${p.desc_es || ""}</textarea></div>
+            <div class="prod-field"><label>描述 (ZH)</label><textarea rows="2" data-field="desc_zh">${p.desc_zh || ""}</textarea></div>
+          </div>
+          <div class="prod-row">
+            <div class="prod-field"><label>Preço (USD)</label><input type="number" data-field="price" value="${p.price}"></div>
+            <div class="prod-field">
+              <label>Categoria</label>
+              <select data-field="category">
+                ${CATEGORIES.map((c) => `<option value="${c}" ${c === p.category ? "selected" : ""}>${c}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+          <div class="prod-actions">
+            <button class="btn btn-gold btn-sm" data-action="save">Salvar alterações</button>
+            <button class="btn btn-outline btn-sm" data-action="delete">Remover peça</button>
+          </div>
+          <p class="prod-msg" style="display:none;"></p>
+        </div>
+      </div>
+    `).join("");
+
+    root.querySelectorAll(".prod-card").forEach((card) => {
+      const id = Number(card.dataset.id);
+      const msgEl = card.querySelector(".prod-msg");
+
+      function showMsg(text, isError) {
+        msgEl.textContent = text;
+        msgEl.style.color = isError ? "#b3453a" : "var(--gold)";
+        msgEl.style.display = "block";
+      }
+
+      card.querySelector('[data-action="save"]').addEventListener("click", async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        try {
+          const fields = { id };
+          card.querySelectorAll("[data-field]").forEach((el) => { fields[el.dataset.field] = el.value; });
+          await callAdmin({ action: "update", ...fields });
+          showMsg("Salvo!", false);
+        } catch (err) {
+          showMsg(err.message, true);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      card.querySelector('[data-action="delete"]').addEventListener("click", async (e) => {
+        if (!confirm("Remover esta peça permanentemente? Não é possível desfazer.")) return;
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        try {
+          await callAdmin({ action: "delete", id });
+          await load();
+        } catch (err) {
+          showMsg(err.message, true);
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  async function load() {
+    try {
+      const data = await callAdmin({ action: "list" });
+      renderProducts(data.products);
+    } catch (err) {
+      root.innerHTML = `<p style="color:#b3453a;">${err.message}</p>`;
+    }
+  }
+  load();
+</script>
+</body>
+</html>
