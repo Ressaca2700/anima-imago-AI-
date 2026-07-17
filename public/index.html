@@ -62,7 +62,7 @@
 
 <section id="about" style="background: var(--bg-alt);">
   <div class="wrap about-block">
-    <img src="assets/gallery/piece-09.jpg" alt="">
+    <img id="about-img" src="assets/gallery/piece-09.jpg" alt="">
     <div>
       <span class="eyebrow" data-i18n="hero.tag">AI-Crafted Photography</span>
       <h2 data-i18n="section.about.title">Born from the mind, not the lens</h2>
@@ -135,6 +135,12 @@
   (async () => {
     const products = await fetchProducts();
     renderGrid(document.getElementById("featured-grid"), products.slice(0, 8));
+    // Mostra uma foto real do acervo na seção "About", em vez de uma imagem genérica.
+    if (products.length) {
+      const pick = products[Math.floor(Math.random() * products.length)];
+      const aboutImg = document.getElementById("about-img");
+      if (aboutImg && pick.img) aboutImg.src = pick.img;
+    }
   })();
   function onLangChangePage() { refreshDynamicTitles(); }
 </script>
