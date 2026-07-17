@@ -7,7 +7,7 @@ const {
   signedUrl,
 } = require("./_lib/supabase");
 
-const VALID_CATEGORIES = ["portrait", "landscape", "abstract", "nature", "stilllife"];
+const VALID_CATEGORIES = ["portrait", "landscape", "abstract", "nature", "stilllife", "blackwhite"];
 
 // Área restrita (senha do estúdio) para publicar, listar, editar e remover peças.
 // A imagem em si é enviada direto ao Supabase antes (via /api/upload-url) — aqui
