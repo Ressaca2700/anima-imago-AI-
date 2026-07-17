@@ -141,7 +141,7 @@
   // então fotos grandes não esbarram no limite de tamanho da Vercel).
   async function uploadFileDirect(password, file, prefix) {
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const r = await fetch("/api/admin-upload-url", {
+    const r = await fetch("/api/upload-url", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password, ext, prefix }),

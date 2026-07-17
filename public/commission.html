@@ -117,10 +117,10 @@
         let referenceImagePath;
         if (referenceFile) {
           const ext = (referenceFile.name.split(".").pop() || "jpg").toLowerCase();
-          const urlRes = await fetch("/api/commission-upload-url", {
+          const urlRes = await fetch("/api/upload-url", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ext }),
+            body: JSON.stringify({ ext, prefix: "commissions/references" }),
           });
           const urlData = await urlRes.json();
           if (!urlRes.ok) throw new Error(urlData.error || "Error preparing upload.");
