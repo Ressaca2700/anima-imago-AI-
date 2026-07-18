@@ -143,7 +143,7 @@ nav.main-nav a:hover, nav.main-nav a.active { color: var(--gold); }
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  --hero-img: url('assets/gallery/piece-01.jpg');
+  --hero-img: url('/assets/gallery/piece-01.jpg');
 }
 .hero::before {
   content: "";
@@ -152,7 +152,7 @@ nav.main-nav a:hover, nav.main-nav a.active { color: var(--gold); }
   background-image: var(--hero-img);
   background-size: cover;
   background-position: center;
-  filter: grayscale(100%);
+  filter: grayscale(80%) sepia(25%) saturate(115%);
 }
 .hero::after {
   content: "";
