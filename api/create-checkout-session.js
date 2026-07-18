@@ -15,8 +15,8 @@ module.exports = async (req, res) => {
     const products = await Promise.all(productIds.map((id) => getProduct(id)));
     const missing = products.some((p) => !p);
     if (missing) return sendJson(res, 404, { error: "Uma ou mais peças não foram encontradas." });
-    const alreadySold = products.some((p) => p.sold);
-    if (alreadySold) return sendJson(res, 409, { error: "Uma das peças do seu carrinho já foi vendida a outra pessoa. Atualize a página." });
+    const soldOut = products.some((p) => (p.sold_count || 0) >= (p.edition_size || 1));
+    if (soldOut) return sendJson(res, 409, { error: "Uma das peças do seu carrinho já esgotou. Atualize a página." });
 
     const siteUrl = process.env.SITE_URL || `https://${req.headers.host}`;
 
@@ -32,7 +32,9 @@ module.exports = async (req, res) => {
           unit_amount: Math.round(Number(p.price) * 100),
           product_data: {
             name: p.title_en,
-            description: "Anima Imago — Single Edition, 1 of 1",
+            description: (p.edition_size || 1) > 1
+              ? `Anima Imago — Limited Edition of ${p.edition_size}`
+              : "Anima Imago — Single Edition, 1 of 1",
           },
         },
       })),

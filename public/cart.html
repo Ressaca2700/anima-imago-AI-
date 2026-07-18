@@ -85,7 +85,7 @@
               <img src="${p.img}" alt="">
               <div>
                 <h3>${productTitle(p)}</h3>
-                <div class="sub">${t["product.edition"]}</div>
+                <div class="sub">${editionLabel(p)}</div>
               </div>
               <div class="price">${money(p.price)}</div>
               <button class="remove-btn" data-remove="${p.id}">${t["cart.remove"]}</button>

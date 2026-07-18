@@ -4,6 +4,7 @@ const {
   listAllProducts,
   updateProduct,
   deleteProduct,
+  getProduct,
   signedUrl,
 } = require("./_lib/supabase");
 
@@ -44,6 +45,14 @@ module.exports = async (req, res) => {
       if (body.price !== undefined) fields.price = Number(body.price);
       if (body.category !== undefined && VALID_CATEGORIES.includes(body.category)) fields.category = body.category;
       if (body.imagePath) fields.image_path = body.imagePath;
+      if (body.editionSize !== undefined) {
+        const size = Math.max(1, Math.round(Number(body.editionSize) || 1));
+        fields.edition_size = size;
+        // Se a edição diminuir para um número igual ou menor ao já vendido, marca como esgotada.
+        const current = await getProduct(body.id);
+        const soldCount = (current && current.sold_count) || 0;
+        fields.sold = soldCount >= size;
+      }
 
       const product = await updateProduct(body.id, fields);
       const previewUrl = await signedUrl(product.image_path, 3600);
@@ -62,6 +71,7 @@ module.exports = async (req, res) => {
     if (!body.price || Number(body.price) <= 0) return sendJson(res, 400, { error: "Informe um preço válido." });
 
     const category = VALID_CATEGORIES.includes(body.category) ? body.category : "abstract";
+    const editionSize = Math.max(1, Math.round(Number(body.editionSize) || 5));
 
     const product = await insertProduct({
       title_en: body.title_en,
@@ -73,6 +83,8 @@ module.exports = async (req, res) => {
       price: Number(body.price),
       category,
       image_path: body.imagePath,
+      edition_size: editionSize,
+      sold_count: 0,
       sold: false,
     });
 

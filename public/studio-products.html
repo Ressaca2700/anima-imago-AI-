@@ -119,6 +119,11 @@
                 ${CATEGORIES.map((c) => `<option value="${c}" ${c === p.category ? "selected" : ""}>${c}</option>`).join("")}
               </select>
             </div>
+            <div class="prod-field">
+              <label>Edição (total de cópias)</label>
+              <input type="number" data-field="editionSize" min="1" value="${p.edition_size || 1}">
+              <span style="display:block; font-size:11.5px; color:var(--muted); margin-top:4px;">${p.sold_count || 0} já vendida(s)</span>
+            </div>
           </div>
           <div class="prod-actions">
             <button class="btn btn-gold btn-sm" data-action="save">Salvar alterações</button>

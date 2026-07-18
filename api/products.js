@@ -15,6 +15,8 @@ module.exports = async (req, res) => {
         title: { en: p.title_en, es: p.title_es, zh: p.title_zh },
         desc: { en: p.desc_en, es: p.desc_es, zh: p.desc_zh },
         img: await signedUrl(p.image_path, 3600),
+        edition_size: p.edition_size || 1,
+        sold_count: p.sold_count || 0,
       }))
     );
     sendJson(res, 200, withUrls);

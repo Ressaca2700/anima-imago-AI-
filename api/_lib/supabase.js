@@ -81,15 +81,29 @@ async function deleteProduct(id) {
   return true;
 }
 
-async function markProductSold(id) {
+// Registra uma venda de uma cópia da peça (edição limitada). Quando o número de
+// vendas atinge o tamanho da edição, a peça é marcada como esgotada (sold = true),
+// exatamente como antes — só que agora isso pode acontecer depois de várias vendas,
+// não só uma.
+async function incrementProductSoldCount(id) {
   assertConfigured();
+  const product = await getProduct(id);
+  if (!product) throw new Error(`Produto ${id} não encontrado ao registrar venda.`);
+  const newSoldCount = (product.sold_count || 0) + 1;
+  const editionSize = product.edition_size || 1;
+  const soldOut = newSoldCount >= editionSize;
+  const fields = { sold_count: newSoldCount };
+  if (soldOut) {
+    fields.sold = true;
+    fields.sold_at = new Date().toISOString();
+  }
   const url = `${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
   const r = await fetch(url, {
     method: "PATCH",
     headers: restHeaders({ Prefer: "return=representation" }),
-    body: JSON.stringify({ sold: true, sold_at: new Date().toISOString() }),
+    body: JSON.stringify(fields),
   });
-  if (!r.ok) throw new Error(`Supabase markProductSold falhou: ${r.status} ${await r.text()}`);
+  if (!r.ok) throw new Error(`Supabase incrementProductSoldCount falhou: ${r.status} ${await r.text()}`);
   return r.json();
 }
 
@@ -294,7 +308,7 @@ module.exports = {
   insertProduct,
   updateProduct,
   deleteProduct,
-  markProductSold,
+  incrementProductSoldCount,
   insertDownload,
   markDownloadPaidBySession,
   getDownloadsBySession,

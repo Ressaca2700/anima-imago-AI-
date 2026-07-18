@@ -1,6 +1,6 @@
 const { readRawBody, sendJson } = require("./_lib/http");
 const { verifyStripeSignature } = require("./_lib/verifyStripeSignature");
-const { markProductSold, markDownloadPaidBySession, markCommissionDepositPaidBySession } = require("./_lib/supabase");
+const { incrementProductSoldCount, markDownloadPaidBySession, markCommissionDepositPaidBySession } = require("./_lib/supabase");
 
 // O Stripe envia este aviso automaticamente quando um pagamento é concluído.
 // Aqui é onde a peça é marcada como vendida e o link de download é liberado.
@@ -40,7 +40,11 @@ module.exports = async (req, res) => {
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean);
-        await Promise.all(productIds.map((id) => markProductSold(id)));
+        // Um de cada vez (não em paralelo), para evitar duas vendas simultâneas da
+        // mesma peça lendo o mesmo número de vendas "antigo" e se sobrescreverem.
+        for (const id of productIds) {
+          await incrementProductSoldCount(id);
+        }
         await markDownloadPaidBySession(session.id);
       }
     }

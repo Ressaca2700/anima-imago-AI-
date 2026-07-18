@@ -64,6 +64,11 @@
           <input type="number" id="f-price" placeholder="72">
         </div>
         <div class="field">
+          <label>Edição (quantas cópias à venda)</label>
+          <input type="number" id="f-edition" min="1" value="5" placeholder="5">
+          <span style="display:block; font-size:12.5px; color:var(--muted); margin-top:4px;">Use 1 para uma peça exclusiva (edição única). A peça some do site quando todas as cópias forem vendidas.</span>
+        </div>
+        <div class="field">
           <label data-i18n="upload.categoryfield">Category</label>
           <select id="f-category">
             <option value="portrait" data-i18n="gallery.filter.portrait">Portrait</option>
@@ -207,6 +212,7 @@
           desc_es: document.getElementById("f-desc-es").value.trim(),
           desc_zh: document.getElementById("f-desc-zh").value.trim(),
           price, category: document.getElementById("f-category").value,
+          editionSize: document.getElementById("f-edition").value || 5,
           imagePath,
         }),
       });
