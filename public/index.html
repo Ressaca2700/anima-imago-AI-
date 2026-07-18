@@ -35,7 +35,7 @@
   </div>
 </header>
 
-<section class="hero" style="background-image: url('assets/gallery/piece-01.jpg');">
+<section class="hero" id="hero">
   <div class="hero-content">
     <span class="hero-tag" data-i18n="hero.tag">AI-Crafted Photography</span>
     <h1 data-i18n="hero.title">Where imagination becomes image.</h1>
@@ -135,12 +135,22 @@
 <script>
   (async () => {
     const products = await fetchProducts();
-    renderGrid(document.getElementById("featured-grid"), products.slice(0, 8));
+    // Uma amostra pequena de peças reais, como convite para ver a galeria completa.
+    renderGrid(document.getElementById("featured-grid"), products.slice(0, 4));
     // Mostra uma foto real do acervo na seção "About", em vez de uma imagem genérica.
     if (products.length) {
       const pick = products[Math.floor(Math.random() * products.length)];
       const aboutImg = document.getElementById("about-img");
       if (aboutImg && pick.img) aboutImg.src = pick.img;
+    }
+    // Foto de capa do herói: prefere uma peça já em preto e branco; se não houver,
+    // usa qualquer peça (o CSS converte para P&B automaticamente).
+    if (products.length) {
+      const bwPieces = products.filter((p) => p.category === "blackwhite");
+      const pool = bwPieces.length ? bwPieces : products;
+      const cover = pool[Math.floor(Math.random() * pool.length)];
+      const hero = document.getElementById("hero");
+      if (hero && cover.img) hero.style.setProperty("--hero-img", `url('${cover.img}')`);
     }
   })();
   function onLangChangePage() { refreshDynamicTitles(); }

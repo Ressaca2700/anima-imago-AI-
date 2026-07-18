@@ -142,9 +142,17 @@ nav.main-nav a:hover, nav.main-nav a.active { color: var(--gold); }
   min-height: 82vh;
   display: flex;
   align-items: flex-end;
+  overflow: hidden;
+  --hero-img: url('assets/gallery/piece-01.jpg');
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-img);
   background-size: cover;
   background-position: center;
-  overflow: hidden;
+  filter: grayscale(100%);
 }
 .hero::after {
   content: "";
