@@ -101,6 +101,7 @@
         <img src="${p.img}" alt="">
         <div>
           <span class="prod-status ${p.sold ? "sold" : "available"}">${p.sold ? "Vendida" : "Disponível"}</span>
+          ${p.is_cover ? `<span class="prod-status" style="color:var(--gold); border-color:var(--gold); margin-left:8px;">★ Foto de capa atual</span>` : ""}
           <div class="prod-row">
             <div class="prod-field"><label>Título (EN)</label><input type="text" data-field="title_en" value="${(p.title_en || "").replace(/"/g, "&quot;")}"></div>
             <div class="prod-field"><label>Título (ES)</label><input type="text" data-field="title_es" value="${(p.title_es || "").replace(/"/g, "&quot;")}"></div>
@@ -127,6 +128,7 @@
           </div>
           <div class="prod-actions">
             <button class="btn btn-gold btn-sm" data-action="save">Salvar alterações</button>
+            ${p.is_cover ? "" : `<button class="btn btn-outline btn-sm" data-action="set-cover">Usar como capa</button>`}
             <button class="btn btn-outline btn-sm" data-action="delete">Remover peça</button>
           </div>
           <p class="prod-msg" style="display:none;"></p>
@@ -158,6 +160,21 @@
           btn.disabled = false;
         }
       });
+
+      const coverBtn = card.querySelector('[data-action="set-cover"]');
+      if (coverBtn) {
+        coverBtn.addEventListener("click", async (e) => {
+          const btn = e.currentTarget;
+          btn.disabled = true;
+          try {
+            await callAdmin({ action: "set-cover", id });
+            await load();
+          } catch (err) {
+            showMsg(err.message, true);
+            btn.disabled = false;
+          }
+        });
+      }
 
       card.querySelector('[data-action="delete"]').addEventListener("click", async (e) => {
         if (!confirm("Remover esta peça permanentemente? Não é possível desfazer.")) return;

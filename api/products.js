@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
         img: await signedUrl(p.image_path, 3600),
         edition_size: p.edition_size || 1,
         sold_count: p.sold_count || 0,
+        is_cover: !!p.is_cover,
       }))
     );
     sendJson(res, 200, withUrls);

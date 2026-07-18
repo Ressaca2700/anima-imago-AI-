@@ -4,6 +4,7 @@ const {
   listAllProducts,
   updateProduct,
   deleteProduct,
+  setCoverProduct,
   getProduct,
   signedUrl,
 } = require("./_lib/supabase");
@@ -63,6 +64,12 @@ module.exports = async (req, res) => {
       if (!body.id) return sendJson(res, 400, { error: "id é obrigatório." });
       await deleteProduct(body.id);
       return sendJson(res, 200, { ok: true });
+    }
+
+    if (action === "set-cover") {
+      if (!body.id) return sendJson(res, 400, { error: "id é obrigatório." });
+      const product = await setCoverProduct(body.id);
+      return sendJson(res, 200, { ok: true, product });
     }
 
     // action === "create" (padrão)

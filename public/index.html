@@ -143,12 +143,17 @@
       const aboutImg = document.getElementById("about-img");
       if (aboutImg && pick.img) aboutImg.src = pick.img;
     }
-    // Foto de capa do herói: prefere uma peça já em preto e branco; se não houver,
-    // usa qualquer peça (o CSS converte para P&B automaticamente).
+    // Foto de capa do herói: usa a peça escolhida manualmente em "Gerenciar Peças"
+    // (marcada com "Usar como capa"). Se nenhuma foi escolhida ainda, sorteia entre
+    // as peças em preto e branco, ou entre todas (o CSS converte para P&B de qualquer jeito).
     if (products.length) {
-      const bwPieces = products.filter((p) => p.category === "blackwhite");
-      const pool = bwPieces.length ? bwPieces : products;
-      const cover = pool[Math.floor(Math.random() * pool.length)];
+      const chosenCover = products.find((p) => p.is_cover);
+      let cover = chosenCover;
+      if (!cover) {
+        const bwPieces = products.filter((p) => p.category === "blackwhite");
+        const pool = bwPieces.length ? bwPieces : products;
+        cover = pool[Math.floor(Math.random() * pool.length)];
+      }
       const hero = document.getElementById("hero");
       if (hero && cover.img) hero.style.setProperty("--hero-img", `url('${cover.img}')`);
     }

@@ -81,6 +81,29 @@ async function deleteProduct(id) {
   return true;
 }
 
+// Só uma peça pode ser a "capa" do site por vez — antes de marcar a nova,
+// desmarca qualquer outra que já estivesse marcada.
+async function setCoverProduct(id) {
+  assertConfigured();
+  const clearUrl = `${SUPABASE_URL}/rest/v1/products?is_cover=eq.true`;
+  const clearRes = await fetch(clearUrl, {
+    method: "PATCH",
+    headers: restHeaders(),
+    body: JSON.stringify({ is_cover: false }),
+  });
+  if (!clearRes.ok) throw new Error(`Supabase setCoverProduct (limpar) falhou: ${clearRes.status} ${await clearRes.text()}`);
+
+  const setUrl = `${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
+  const setRes = await fetch(setUrl, {
+    method: "PATCH",
+    headers: restHeaders({ Prefer: "return=representation" }),
+    body: JSON.stringify({ is_cover: true }),
+  });
+  if (!setRes.ok) throw new Error(`Supabase setCoverProduct falhou: ${setRes.status} ${await setRes.text()}`);
+  const rows = await setRes.json();
+  return rows[0];
+}
+
 // Registra uma venda de uma cópia da peça (edição limitada). Quando o número de
 // vendas atinge o tamanho da edição, a peça é marcada como esgotada (sold = true),
 // exatamente como antes — só que agora isso pode acontecer depois de várias vendas,
@@ -308,6 +331,7 @@ module.exports = {
   insertProduct,
   updateProduct,
   deleteProduct,
+  setCoverProduct,
   incrementProductSoldCount,
   insertDownload,
   markDownloadPaidBySession,
