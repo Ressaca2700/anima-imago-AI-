@@ -370,7 +370,7 @@ section { padding: 96px 0; }
   align-items: center;
 }
 @media (max-width: 860px) { .about-block { grid-template-columns: 1fr; gap: 40px; } }
-.about-block img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
+.about-block img { width: 100%; aspect-ratio: 3/2; object-fit: cover; }
 .about-block h2 { font-size: clamp(26px, 3.4vw, 36px); margin-bottom: 22px; }
 .about-block p { color: var(--muted); font-size: 15.5px; }
 
