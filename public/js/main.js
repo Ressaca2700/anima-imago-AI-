@@ -70,7 +70,7 @@ function renderCard(p) {
   <a class="card" href="product.html?id=${p.id}">
     <span class="card-badge">${editionBadge(p)}</span>
     <div class="thumb protected">
-      <img src="${p.img}" alt="" loading="lazy">
+      <img src="${p.img}" alt="" loading="lazy" draggable="false" oncontextmenu="return false;">
       <button type="button" class="expand-btn" data-expand-src="${p.img}" aria-label="View full image">${EXPAND_ICON}</button>
     </div>
     <div class="card-info">
@@ -89,7 +89,9 @@ function openLightbox(src) {
   overlay.id = "lightbox-overlay";
   overlay.innerHTML = `
     <button type="button" class="lightbox-close" aria-label="Close">&times;</button>
-    <img src="${src}" alt="">
+    <div class="lightbox-img-wrap protected">
+      <img src="${src}" alt="" draggable="false" oncontextmenu="return false;">
+    </div>
   `;
   overlay.addEventListener("click", (e) => { if (e.target === overlay) closeLightbox(); });
   overlay.querySelector(".lightbox-close").addEventListener("click", closeLightbox);
