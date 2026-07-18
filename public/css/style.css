@@ -152,7 +152,6 @@ nav.main-nav a:hover, nav.main-nav a.active { color: var(--gold); }
   background-image: var(--hero-img);
   background-size: cover;
   background-position: center;
-  filter: grayscale(80%) sepia(25%) saturate(115%);
 }
 .hero::after {
   content: "";

@@ -144,8 +144,8 @@
       if (aboutImg && pick.img) aboutImg.src = pick.img;
     }
     // Foto de capa do herói: usa a peça escolhida manualmente em "Gerenciar Peças"
-    // (marcada com "Usar como capa"). Se nenhuma foi escolhida ainda, sorteia entre
-    // as peças em preto e branco, ou entre todas (o CSS converte para P&B de qualquer jeito).
+    // (marcada com "Usar como capa"), mostrada com as cores reais dela. Se nenhuma foi
+    // escolhida ainda, sorteia entre as peças em preto e branco, ou entre todas.
     if (products.length) {
       const chosenCover = products.find((p) => p.is_cover);
       let cover = chosenCover;
