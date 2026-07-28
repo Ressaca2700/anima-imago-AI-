@@ -472,6 +472,15 @@ footer.site {
 .product-info .price { font-size: 24px; color: var(--gold); margin-bottom: 22px; font-family: 'Playfair Display', serif; }
 .product-info .desc { color: var(--muted); font-size: 15.5px; margin-bottom: 28px; }
 .product-actions { display: flex; gap: 14px; margin-bottom: 34px; flex-wrap: wrap; }
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 26px;
+}
+.trust-badge svg { flex-shrink: 0; color: var(--gold); }
 .product-meta {
   border-top: 1px solid var(--border);
   padding-top: 26px;
