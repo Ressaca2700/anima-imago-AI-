@@ -215,7 +215,7 @@ const I18N = {
     "product.buynow": "立即购买",
     "product.license.title": "许可协议",
     "product.license.body": "包含完整的个人及商业使用许可。高分辨率数字文件，无水印，购买后即时交付——非常适合作为书籍封面、编辑排版及印刷使用。",
-    "product.back": "返回画廊",
+    "product.back": "返回画廊","trust.badge": "由 Stripe 提供安全支付保障。付款确认后，文件将立即通过邮件发送给您。",
     "cart.title": "您的购物车",
     "cart.empty": "购物车是空的。",
     "cart.browse": "浏览画廊",
