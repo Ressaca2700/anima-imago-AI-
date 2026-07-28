@@ -128,7 +128,7 @@ const I18N = {
     "product.buynow": "Comprar Ahora",
     "product.license.title": "Licencia",
     "product.license.body": "Incluye licencia completa de uso personal y comercial. Archivo digital en alta resolución, sin marca de agua, entregado al instante tras la compra — ideal para portadas de libros, diseño editorial e impresión.",
-    "product.back": "Volver a la galería",
+    "product.back": "Volver a la galería", "trust.badge": "Pago seguro procesado por Stripe. Tu archivo se entrega al instante por correo electrónico tras confirmarse el pago.",
     "cart.title": "Tu Carrito",
     "cart.empty": "Tu carrito está vacío.",
     "cart.browse": "Explorar la galería",
