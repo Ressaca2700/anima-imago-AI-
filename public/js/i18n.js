@@ -41,7 +41,7 @@ const I18N = {
     "product.buynow": "Buy Now",
     "product.license.title": "License",
     "product.license.body": "Full personal & commercial use license included. High-resolution digital file, no watermark, delivered instantly after purchase — ideal for book covers, editorial layouts, and print.",
-    "product.back": "Back to gallery","trust.badge": "Secure payment powered by Stripe. Your file is delivered instantly by email after payment is confirmed.",
+    "trust.badge": "Secure payment powered by Stripe. Your file is delivered instantly via a secure download link after payment is confirmed.",
     "cart.title": "Your Cart",
     "cart.empty": "Your cart is empty.",
     "cart.browse": "Browse the gallery",
