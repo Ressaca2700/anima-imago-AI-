@@ -34,7 +34,7 @@ const I18N = {
     "gallery.filter.nature": "Nature",
     "gallery.filter.stilllife": "Still Life",
     "gallery.filter.blackwhite": "Black & White",
-    "gallery.filter.foodwine": "Food & Wine",
+    "gallery.filter.foodwine": "Food & Wine", "gallery.filter.paintings": "Paintings",
     "product.edition.unique": "Single Edition — 1 of 1",
     "product.edition.limited": "Limited Edition — {remaining} of {total} remaining",
     "product.addcart": "Add to Cart",
