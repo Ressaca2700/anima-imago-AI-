@@ -136,7 +136,7 @@
   (async () => {
     const products = await fetchProducts();
     // Uma amostra pequena de peças reais, como convite para ver a galeria completa.
-    renderGrid(document.getElementById("featured-grid"), products.slice(0, 4));
+    renderGrid(document.getElementById("featured-grid"), products.slice(0, 8));
     // Mostra uma foto real do acervo na seção "About", em vez de uma imagem genérica.
     if (products.length) {
       const pick = products[Math.floor(Math.random() * products.length)];
