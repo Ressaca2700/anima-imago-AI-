@@ -114,18 +114,7 @@ const I18N = {
 "section.aboutme.body3": "Eso cambió cuando mi hermano enfermó. Era médico, y sabía, con una claridad que solo la medicina da, exactamente cómo avanzaría la enfermedad. Lo acompañé en ese proceso lento y doloroso, y fue entonces cuando la fotografía dejó de ser admiración y se convirtió en otra cosa: una forma de curar heridas, de calmar el dolor, de hacer un poco más ligero lo que era, casi siempre, insoportablemente pesado.",
 "section.aboutme.body4": "Hoy uso la inteligencia artificial como quien usa un nuevo pincel — una herramienta más en la mano de una mirada que ya existía antes de ella, y que sigue siendo, sobre todo, mía. Cada imagen en Anima Imago lleva un poco de ese recorrido: la niebla, el silencio, el blanco y negro que no esconde el dolor, pero tampoco se rinde ante él.",
 
-Depois disso, falta só a 3ª e última: o bloco zh (chinês), mais adiante. Continue rolando e me avisa quando achar.
-
-
-
-
-Claude é uma IA e pode cometer erros. Verifique as respostas. Envie seu feedback
-
-Veja o progresso da tarefa para tarefas mais longas.
-
-restored_v2.jpg
-Conectores
-Pesquisa na web
+    
     "section.how.title": "Cómo funciona",
     "how.1.title": "Descubre",
     "how.1.body": "Explora una colección en constante evolución de originales generados con IA.",
