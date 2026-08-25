@@ -15,7 +15,12 @@ const I18N = {
     "section.featured.sub": "Newly released, limited-edition pieces.",
     "section.viewall": "View full gallery",
     "section.about.title": "Born from the mind, not the lens",
-    "section.about.body": "Anima Imago is a gallery of photographs that never passed through a camera. Each work begins as a thought — refined through generative AI, hand-selected, and released in a small, limited edition. Once every copy sells, the piece is retired forever. With their striking composition and negative space, many pieces work beautifully as book covers and editorial art.",
+    "section.about.body": "Anima Imago is a gallery of photographs that never passed through a camera. Each work begins as a thought — refined through generative AI, hand-selected, and released in a small, limited edition. Once every copy sells, the piece is retired forever. With their striking composition and negative space, many pieces work beautifully as book covers and editorial art.","section.aboutme.tag": "The Photographer",
+    "section.aboutme.tag": "The Photographer","section.aboutme.title": "A Life Written in Light",
+    "section.aboutme.body1": "I am Marília Ferraz, and I have been photographing for almost twenty years.",
+    "section.aboutme.body2": "I began with flowers — an exercise in attention, in light, in patience with what is small and passing. An English magazine once ran a feature on that work, back when photography was, for me, simply a way of admiring the world.",
+    "section.aboutme.body3": "That changed when my brother fell ill. He was a doctor, and he understood, with a clarity only medicine can give, exactly how the disease would progress. I walked beside him through that slow and painful process, and it was then that photography stopped being admiration and became something else: a way of tending wounds, of quieting pain, of making the unbearable a little lighter to carry.",
+    "section.aboutme.body4": "Today, I use artificial intelligence the way one uses a new brush — one more tool in the hand of a vision that existed long before it, and that remains, above all, mine. Every image in Anima Imago carries a trace of that journey: the fog, the silence, the black and white that does not hide the pain, but does not surrender to it either.",
     "section.how.title": "How it works",
     "how.1.title": "Discover",
     "how.1.body": "Browse a constantly evolving collection of AI-generated originals.",
@@ -102,7 +107,25 @@ const I18N = {
     "section.featured.sub": "Piezas de edición limitada, recién publicadas.",
     "section.viewall": "Ver galería completa",
     "section.about.title": "Nacida de la mente, no del lente",
-    "section.about.body": "Anima Imago es una galería de fotografías que nunca pasaron por una cámara. Cada obra comienza como una idea, refinada mediante IA generativa, seleccionada a mano y publicada en una edición pequeña y limitada. Cuando se venden todas las copias, la pieza se retira para siempre. Por su composición impactante y espacio negativo, muchas piezas funcionan maravillosamente como portadas de libros y arte editorial.",
+    "section.about.body": "Anima Imago es una galería de fotografías que nunca pasaron por una cámara. Cada obra comienza como una idea, refinada mediante IA generativa, seleccionada a mano y publicada en una edición pequeña y limitada. Cuando se venden todas las copias, la pieza se retira para siempre. Por su composición impactante y espacio negativo, muchas piezas funcionan maravillosamente como portadas de libros y arte editorial.","section.aboutme.tag": "La Fotógrafa",
+"section.aboutme.title": "Una Vida Escrita en Luz",
+"section.aboutme.body1": "Soy Marília Ferraz, y fotografío desde hace casi veinte años.",
+"section.aboutme.body2": "Empecé fotografiando flores — un ejercicio de atención, de luz, de paciencia con lo pequeño y pasajero. Una revista inglesa llegó a publicar un reportaje sobre ese trabajo, en una época en que la fotografía era, para mí, simplemente una forma de admirar el mundo.",
+"section.aboutme.body3": "Eso cambió cuando mi hermano enfermó. Era médico, y sabía, con una claridad que solo la medicina da, exactamente cómo avanzaría la enfermedad. Lo acompañé en ese proceso lento y doloroso, y fue entonces cuando la fotografía dejó de ser admiración y se convirtió en otra cosa: una forma de curar heridas, de calmar el dolor, de hacer un poco más ligero lo que era, casi siempre, insoportablemente pesado.",
+"section.aboutme.body4": "Hoy uso la inteligencia artificial como quien usa un nuevo pincel — una herramienta más en la mano de una mirada que ya existía antes de ella, y que sigue siendo, sobre todo, mía. Cada imagen en Anima Imago lleva un poco de ese recorrido: la niebla, el silencio, el blanco y negro que no esconde el dolor, pero tampoco se rinde ante él.",
+
+Depois disso, falta só a 3ª e última: o bloco zh (chinês), mais adiante. Continue rolando e me avisa quando achar.
+
+
+
+
+Claude é uma IA e pode cometer erros. Verifique as respostas. Envie seu feedback
+
+Veja o progresso da tarefa para tarefas mais longas.
+
+restored_v2.jpg
+Conectores
+Pesquisa na web
     "section.how.title": "Cómo funciona",
     "how.1.title": "Descubre",
     "how.1.body": "Explora una colección en constante evolución de originales generados con IA.",
