@@ -90,7 +90,7 @@ function openLightbox(src) {
   overlay.innerHTML = `
     <button type="button" class="lightbox-close" aria-label="Close">&times;</button>
     <div class="lightbox-img-wrap protected">
-      <img src="${src}" alt="" draggable="false" oncontextmenu="return false;">
+      <img src="${src}" alt="" loading="lazy" draggable="false" oncontextmenu="return false;">
     </div>
   `;
   overlay.addEventListener("click", (e) => { if (e.target === overlay) closeLightbox(); });
